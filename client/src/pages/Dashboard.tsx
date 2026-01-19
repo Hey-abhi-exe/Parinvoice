@@ -4,7 +4,7 @@ import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 import type { Invoice } from '../types';
-import { Plus, FileText, TrendingUp, Users, DollarSign, Clock, ArrowUpRight, ArrowDownRight, Archive } from 'lucide-react';
+import { Plus, FileText, TrendingUp, Users, DollarSign, Clock, ArrowUpRight, ArrowDownRight, Archive, Download } from 'lucide-react';
 
 export default function Dashboard() {
     const { token } = useAuth();
@@ -38,6 +38,28 @@ export default function Dashboard() {
             if (res.ok) setRecurringCount(data.length);
         } catch (error) {
             console.error(error);
+        }
+    };
+
+    const downloadAllInvoices = async () => {
+        try {
+            const res = await fetch('http://localhost:3001/api/invoices/download-all', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Failed');
+
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `invoices-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error(error);
+            alert('Failed to download invoices');
         }
     };
 
@@ -131,8 +153,11 @@ export default function Dashboard() {
                             <Link to="/clients/new" className="btn" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', justifyContent: 'center' }}>
                                 <Users size={16} /> Add Client
                             </Link>
-                            <Link to="/ai-generator" className="btn" style={{ background: 'linear-gradient(90deg, var(--accent-purple), var(--primary))', gridColumn: 'span 2', justifyContent: 'center', border: 'none', color: 'white' }}>
-                                ✨ Ask AI Assistant
+                            <button onClick={downloadAllInvoices} className="btn" style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', justifyContent: 'center', cursor: 'pointer' }}>
+                                <Download size={16} /> Download CSV
+                            </button>
+                            <Link to="/ai-generator" className="btn" style={{ background: 'linear-gradient(90deg, var(--accent-purple), var(--primary))', gridColumn: 'span 1', justifyContent: 'center', border: 'none', color: 'white' }}>
+                                ✨ Ask AI
                             </Link>
                         </div>
                     </div>
