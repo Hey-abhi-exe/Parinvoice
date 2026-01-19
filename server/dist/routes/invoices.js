@@ -19,6 +19,37 @@ router.get('/', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch invoices' });
     }
 });
+router.get('/download-all', async (req, res) => {
+    const userId = req.user.userId;
+    try {
+        const invoices = await db_1.prisma.invoice.findMany({
+            where: { userId },
+            include: { client: true, items: true },
+            orderBy: { createdAt: 'desc' }
+        });
+        const headers = ['Invoice Number', 'Client Name', 'Date', 'Due Date', 'Total', 'Status', 'Items Count'];
+        const rows = invoices.map(inv => [
+            inv.id.substring(0, 8).toUpperCase(), // specific ID format usually preferred
+            inv.client?.name || 'Unknown',
+            new Date(inv.date).toISOString().split('T')[0],
+            inv.dueDate ? new Date(inv.dueDate).toISOString().split('T')[0] : '',
+            inv.total,
+            inv.status,
+            inv.items.length
+        ]);
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.map(field => `"${field}"`).join(','))
+        ].join('\n');
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename="invoices.csv"');
+        res.send(csvContent);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to download invoices' });
+    }
+});
 router.post('/', async (req, res) => {
     const userId = req.user.userId;
     const { clientId, date, dueDate, items, total, status, subtotal, taxRate, taxAmount, discount } = req.body;
