@@ -4,7 +4,7 @@ services:
   server:
     build:
       context: ./server
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile
     ports:
       - "3001:3001"
     volumes:
@@ -17,7 +17,7 @@ services:
   client:
     build:
       context: ./client
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile
     ports:
       - "80:80"
     depends_on:

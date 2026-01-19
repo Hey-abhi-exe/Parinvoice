@@ -1,0 +1,28 @@
+services:
+  # Backend Service
+  - type: web
+    name: invoice-server
+    env: node
+    plan: free
+    dockerContext: ./server
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+
+  # Frontend Static Site
+  - type: static
+    name: invoice-client
+    env: static
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: ./client/dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: invoice-server
+          property: url

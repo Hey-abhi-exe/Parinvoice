@@ -39,12 +39,38 @@ This application consists of two parts:
 
 3.  **Start Command**: `npm start` (which runs `node dist/index.js`).
 
-**Railway Example:**
-- Import project.
-- Set Root Directory to `server`.
-- Add variables.
-- Add a PostgreSQL plugin and link it as `DATABASE_URL`.
 - Deploy!
+
+## ☁️ Render Deployment (Easiest)
+
+This project includes a `render.yaml` "Blueprint" for automatic deployment.
+
+1.  Push your code to GitHub.
+2.  Go to **Render.com** -> **Blueprints**.
+3.  Click **New Blueprint Instance**.
+4.  Select your repository.
+5.  Click **Apply**.
+
+Render will automatically detect the Server (Docker) and Client (Static Site) and link them together.
+
+
+---
+
+## 🐳 Docker Production (Local & VPS)
+
+You can run the full production stack locally or on a VPS (like shared digitalocean droplet) using Docker Compose.
+
+1.  **Requirement**: Install Docker & Docker Compose.
+2.  **Command**:
+    ```bash
+    docker-compose -f docker-compose.prod.yml up --build -d
+    ```
+3.  **Access**:
+    - App: `http://localhost` (Port 80)
+    - Server (Internal): `http://localhost:3001`
+    - No need to run `npm start` manually.
+
+This setup uses **Nginx** for the frontend and a production-optimized Node image for the server.
 
 ---
 

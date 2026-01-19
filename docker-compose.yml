@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   server:
-    build: ./server
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
     ports:
       - "3001:3001"
     volumes:
@@ -14,7 +16,9 @@ services:
       - PORT=3001
 
   client:
-    build: ./client
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
     ports:
       - "5173:5173"
     volumes:
